@@ -7,18 +7,21 @@ of tuples of the form (<ip_addres>, <url>).
 
 """
 
+from collections import namedtuple
 import sqlite3
 import pathlib
 
 sql_db = "./unbound-sinkhole.db"
 db_sinkhole_table = "list"
 
+Record = namedtuple('Record', 'address url')
+
 def _set_blacklist(blacklist):
     return ("TRUE" if blacklist else "FALSE")
 
 def _generate_records(cursor):
     for r in cursor.fetchall():
-        yield r
+        yield Record(*list(r))
 
 def init_db():
     """ Initialize the database,
