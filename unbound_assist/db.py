@@ -16,6 +16,10 @@ db_sinkhole_table = "list"
 def _set_blacklist(blacklist):
     return ("TRUE" if blacklist else "FALSE")
 
+def _generate_records(cursor):
+    for r in cursor.fetchall():
+        yield r
+
 def init_db():
     """ Initialize the database,
     or return if db already exists """
@@ -84,6 +88,6 @@ def get_blacklist():
         List containing all blacklist records.
     """
     with sqlite3.connect(sql_db) as con:
-        r = con.execute('''SELECT ip_addr, url FROM {0}
+        cursor = con.execute('''SELECT ip_addr, url FROM {0}
         WHERE sinkhole = "TRUE"'''.format(db_sinkhole_table))
-    return r.fetchall()
+    return _generate_records(cursor)

@@ -2,8 +2,11 @@ import unittest
 import db as db
 import sqlite3
 
+test_db = "tests/outputs/test.db"
+
 class TestDb(unittest.TestCase):
     def setUp(self):
+        db.sql_db = test_db
         db.init_db()
 
     def tearDown(self):
