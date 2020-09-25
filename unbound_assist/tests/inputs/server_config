@@ -1,0 +1,14 @@
+
+# server config file not unlike one that might be encountered
+remote-control:
+  control-enable: no
+
+server:
+# list on local interfaces
+  interface: 127.0.0.1
+  interface: ::1
+
+forward-zone:
+  name: "."
+  forward-addr: 8.8.8.8
+  forward-addr: 8.8.4.4
