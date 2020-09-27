@@ -13,6 +13,7 @@ if __name__ == '__main__':
             ]
         },
 
+        test_suite='unbound_sinkhole.tests',
         description='Script for sinkholing hosts using Unbound.',
 
         license='MIT'
