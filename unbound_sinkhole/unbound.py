@@ -2,7 +2,8 @@
 Unbound related functions.
 """
 
-import dbus
+
+import os
 import re
 import shutil
 import subprocess

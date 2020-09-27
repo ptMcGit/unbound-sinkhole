@@ -1,4 +1,5 @@
-import parsing
+import unbound_sinkhole.parsing as parsing
+
 from pathlib import Path
 import unittest
 
@@ -33,8 +34,8 @@ class TestParsing(unittest.TestCase):
 
     def test_process_files(self):
         # check ok files
-        l = list(parsing.process_files(['tests/inputs/records_file_ok',
-                                   'tests/inputs/records_file_ok2']))
+        l = list(parsing.process_files(['unbound_sinkhole/tests/inputs/records_file_ok',
+                                   'unbound_sinkhole/tests/inputs/records_file_ok2']))
 
         self.assertEqual([('0.0.0.0', 'bad-site.com'),
                           ('181.16.9.1', 'www.evil-site.com'),
@@ -43,14 +44,14 @@ class TestParsing(unittest.TestCase):
                          l)
 
         # check file that doesn't exist
-        non_file = "tests/inputs/nonexistent_file"
+        non_file = "unbound_sinkhole/tests/inputs/nonexistent_file"
         self.assertFalse(Path(non_file).exists())
 
         with self.assertRaises(Exception):
             parsing.process_files(non_file)
 
         # check file with bad records
-        bad_records_file = 'tests/inputs/records_file_bad'
+        bad_records_file = 'unbound_sinkhole/tests/inputs/records_file_bad'
         with self.assertRaises(Exception):
             parsing.process_files(bad_records__file)
 

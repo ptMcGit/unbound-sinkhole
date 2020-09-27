@@ -1,8 +1,8 @@
 import unittest
-import db as db
+import unbound_sinkhole.db as db
 import sqlite3
 
-test_db = "tests/outputs/test.db"
+test_db = "unbound_sinkhole/tests/outputs/test.db"
 
 class TestDb(unittest.TestCase):
     def setUp(self):

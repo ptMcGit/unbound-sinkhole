@@ -6,9 +6,9 @@ for consumption by unbound.
 """
 
 import sqlite3
-import db
+import unbound_sinkhole.db as db
 import tempfile
-import unbound
+import unbound_sinkhole.unbound as unbound
 
 default_sinkhole_response = "always_nxdomain"
 sinkhole_file = "sinkhole.conf"

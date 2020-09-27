@@ -1,15 +1,15 @@
 from subprocess import CalledProcessError
-import db
+import unbound_sinkhole.db as db
 import os
 import re
 import shutil
-import tests.test_db as test_db
-import unbound
+import unbound_sinkhole.tests.test_db as test_db
+import unbound_sinkhole.unbound as unbound
 import unittest
-import writer
+import unbound_sinkhole.writer as writer
 
-server_config = 'tests/outputs/server_config'
-server_config_original = 'tests/inputs/server_config_original'
+server_config = 'unbound_sinkhole/tests/outputs/server_config'
+server_config_original = 'unbound_sinkhole/tests/inputs/server_config_original'
 
 class TestMyClass(unittest.TestCase):
 
@@ -23,7 +23,7 @@ class TestMyClass(unittest.TestCase):
 
     def test_records_to_file(self):
         # create some records
-        writer.sinkhole_file = "tests/outputs/test_sinkhole.conf"
+        writer.sinkhole_file = "unbound_sinkhole/tests/outputs/test_sinkhole.conf"
 
         a = ("0.0.0.0", "a.com")
         b = ("1.1.1.1", "b.com")

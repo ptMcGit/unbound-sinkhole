@@ -9,12 +9,29 @@ of tuples of the form (<ip_addres>, <url>).
 
 from collections import namedtuple
 import sqlite3
-import pathlib
+from pathlib import Path
 
 sql_db = "./unbound-sinkhole.db"
 db_sinkhole_table = "list"
 
 Record = namedtuple('Record', 'address url')
+
+def _db_sanity_checks():
+    """Sanity checks for the db.
+
+    - Does the DB exist?
+    - Is the DB setup?
+
+    Returns: True if DB checks out, False otherwise.
+    """
+    msg = 'the DB does not exist or is not setup'
+    if not Path(sql_db).exists():
+        raise Exception(msg)
+
+    with sqlite3.connect(sql_db) as con:
+        q = con.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;")
+        if db_sinkhole_table not in [t[0] for t in q.fetchall()]:
+            raise Exception(msg)
 
 def _set_blacklist(blacklist):
     return ("TRUE" if blacklist else "FALSE")
@@ -26,8 +43,12 @@ def _generate_records(cursor):
 def init_db():
     """ Initialize the database,
     or return if db already exists """
-    if pathlib.Path(sql_db).exists():
+
+    #breakpoint
+
+    if Path(sql_db).exists():
         return
+
 
     with sqlite3.connect(sql_db) as con:
         con.execute('''CREATE TABLE {0} (
@@ -49,6 +70,8 @@ def update_records(records, blacklist=True):
     Raises:
         Any error that is not sqlite3.IntegrityError.
     """
+
+    _db_sanity_checks()
 
     blacklist = _set_blacklist(blacklist)
     with sqlite3.connect(sql_db) as con:
@@ -72,6 +95,8 @@ def delete_records(records):
         Any error that is not sqlite3.IntegrityError.
     """
 
+    _db_sanity_checks()
+
     with sqlite3.connect(sql_db) as con:
         for r in records:
             con.execute('''DELETE FROM {0}
@@ -82,6 +107,12 @@ def delete_records(records):
 def purge_db():
     """ Purge all the records from the db.
     """
+    try:
+        _db_sanity_checks()
+    except Exception as e:
+        init_db()
+        return
+
     with sqlite3.connect(sql_db) as con:
         con.execute("DELETE FROM {0}".format(db_sinkhole_table))
 

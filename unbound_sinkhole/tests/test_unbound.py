@@ -3,10 +3,10 @@ import unittest
 class TestUnbound(unittest.TestCase):
 
     def setUp(self):
-        # do before each test
+        pass
 
     def tearDown(self):
-        # do after each test
+        pass
 
     def test_insert_line(self):
         # this gets covered by test_writer.test_modify_server_config()
