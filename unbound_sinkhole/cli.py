@@ -62,7 +62,7 @@ def main(cmdline_override=None):
         db_arg = args.positional_arg
 
         if args.file:
-            record_gen = process_files(db_arg)
+            record_gen = parsing.process_files(db_arg)
         else:
             record_gen = (r for r in [(db_arg[0], db_arg[1])])
 

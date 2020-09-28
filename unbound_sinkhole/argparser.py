@@ -12,9 +12,8 @@ def parse_args(args=None):
 
 file_arg = (['--file',
              '--f'],
-            {'dest': 'file',
+            {'action': 'store_true',
              'help': 'Whether File to load data from.',
-             'nargs': 1,
              'default': False,
              'required': False})
 
