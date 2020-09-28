@@ -5,15 +5,16 @@ These functions help write data to the DNS sinkhole file
 for consumption by unbound.
 """
 
+import unbound_sinkhole.conf as conf
+
 import sqlite3
 import unbound_sinkhole.db as db
 import tempfile
 import unbound_sinkhole.unbound as unbound
 
 default_sinkhole_response = "always_nxdomain"
-sinkhole_file = "sinkhole.conf"
 template = 'local-zone "{0}" ' + default_sinkhole_response
-include_statement = 'include: ' + sinkhole_file + '\n'
+include_statement = 'include: ' + conf.sinkhole_conf + '\n'
 
 def records_to_file():
     """Write records to the sinkhole file.

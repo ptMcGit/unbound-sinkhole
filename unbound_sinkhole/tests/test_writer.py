@@ -7,15 +7,17 @@ import unbound_sinkhole.tests.test_db as test_db
 import unbound_sinkhole.unbound as unbound
 import unittest
 import unbound_sinkhole.writer as writer
+import unbound_sinkhole.conf as conf
 
-server_config = 'unbound_sinkhole/tests/outputs/server_config'
+
+conf.initialize_confs('unbound_sinkhole/tests/inputs/test_config')
+
+server_config = conf.server_conf
 server_config_original = 'unbound_sinkhole/tests/inputs/server_config_original'
 
 class TestMyClass(unittest.TestCase):
 
     def setUp(self):
-        # do before each test
-        db.sql_db = test_db.test_db
         db.init_db()
 
     def tearDown(self):
