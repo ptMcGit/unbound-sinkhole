@@ -1,0 +1,7 @@
+[main]
+# Where the DB is stored
+sinkhole_db = unbound_sinkhole/tests/outputs/test.db
+# Where the unbound sinkhole entries are stored
+sinkhole_conf = unbound_sinkhole/tests/outputs/sinkhole.conf
+# The unbound server file that will be modified to utilize sinkholing
+server_conf = unbound_sinkhole/tests/inputs/server_config

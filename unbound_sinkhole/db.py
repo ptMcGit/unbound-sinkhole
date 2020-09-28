@@ -10,8 +10,9 @@ of tuples of the form (<ip_addres>, <url>).
 from collections import namedtuple
 import sqlite3
 from pathlib import Path
+import unbound_sinkhole.conf as conf
 
-sql_db = "./unbound-sinkhole.db"
+
 db_sinkhole_table = "list"
 
 Record = namedtuple('Record', 'address url')
@@ -25,10 +26,11 @@ def _db_sanity_checks():
     Returns: True if DB checks out, False otherwise.
     """
     msg = 'the DB does not exist or is not setup'
-    if not Path(sql_db).exists():
+
+    if not Path(sinkhole_db).exists():
         raise Exception(msg)
 
-    with sqlite3.connect(sql_db) as con:
+    with sqlite3.connect(sinkhole_db) as con:
         q = con.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;")
         if db_sinkhole_table not in [t[0] for t in q.fetchall()]:
             raise Exception(msg)
@@ -44,13 +46,11 @@ def init_db():
     """ Initialize the database,
     or return if db already exists """
 
-    #breakpoint
-
-    if Path(sql_db).exists():
+    if Path(sinkhole_db).exists():
         return
 
 
-    with sqlite3.connect(sql_db) as con:
+    with sqlite3.connect(sinkhole_db) as con:
         con.execute('''CREATE TABLE {0} (
         id INTEGER PRIMARY KEY,
         sinkhole BOOLEAN DEFAULT TRUE,
@@ -74,7 +74,7 @@ def update_records(records, blacklist=True):
     _db_sanity_checks()
 
     blacklist = _set_blacklist(blacklist)
-    with sqlite3.connect(sql_db) as con:
+    with sqlite3.connect(sinkhole_db) as con:
         for r in records:
             print((blacklist,) + r)
             try:
@@ -97,7 +97,7 @@ def delete_records(records):
 
     _db_sanity_checks()
 
-    with sqlite3.connect(sql_db) as con:
+    with sqlite3.connect(sinkhole_db) as con:
         for r in records:
             con.execute('''DELETE FROM {0}
             WHERE (ip_addr = "{1}" AND url = "{2}")'''.format(db_sinkhole_table,
@@ -113,7 +113,7 @@ def purge_db():
         init_db()
         return
 
-    with sqlite3.connect(sql_db) as con:
+    with sqlite3.connect(sinkhole_db) as con:
         con.execute("DELETE FROM {0}".format(db_sinkhole_table))
 
 def get_blacklist():
@@ -121,7 +121,7 @@ def get_blacklist():
     Returns:
         List containing all blacklist records.
     """
-    with sqlite3.connect(sql_db) as con:
+    with sqlite3.connect(sinkhole_db) as con:
         cursor = con.execute('''SELECT ip_addr, url FROM {0}
         WHERE sinkhole = "TRUE"'''.format(db_sinkhole_table))
     return _generate_records(cursor)

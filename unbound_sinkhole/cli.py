@@ -29,12 +29,34 @@ import unbound_sinkhole.argparser as argparser
 import unbound_sinkhole.db as db
 import unbound_sinkhole.parsing as parsing
 import unbound_sinkhole.unbound as unbound
+import unbound_sinkhole.conf as conf
 
 import os
 import sys
 
+main_config = "/usr/local/etc/unbound-sinkhole/unbound-sinkhole.conf"
+main_config = "unbound_sinkhole/data/unbound-sinkhole.conf"
 def main():
     """Main entrypoint."""
+
+    conf.initialize_confs(main_config)
+
+    #breakpoint
+    from pprint import pprint as pp; from code import interact; interact(local=dict(globals(), **locals()))
+
+
+#    configs = conf.get_confs(main_config)
+
+
+    # sql_db = configs['sinkhole_db']
+    # sinkhole_file = configs['sinkhole_conf']
+    # server_conf = configs['server_conf']
+
+#    if server_conf is None:
+#        raise Exception('server config file is not set, you can set it in {0}'.format(main_config))
+
+    #breakpoint
+    from pprint import pprint as pp; from code import interact; interact(local=dict(globals(), **locals()))
 
     args = argparser.parser.parse_args()
 
@@ -55,7 +77,6 @@ def main():
             db.update_records(record_gen, blacklist=False)
         elif args.blacklist:
             db.update_records(record_gen, blacklist=True)
-
 
     elif args.sub_command == "enable":
         writer.update_server_config(config_file, enable=True)

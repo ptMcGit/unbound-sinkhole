@@ -1,12 +1,14 @@
-import unittest
+import unbound_sinkhole.conf as conf
 import unbound_sinkhole.db as db
 import sqlite3
+import unittest
 
-test_db = "unbound_sinkhole/tests/outputs/test.db"
+conf.initialize_confs('unbound_sinkhole/tests/inputs/test_config')
+db.sinkhole_db = conf.sinkhole_db
+
 
 class TestDb(unittest.TestCase):
     def setUp(self):
-        db.sql_db = test_db
         db.init_db()
 
     def tearDown(self):
@@ -15,7 +17,7 @@ class TestDb(unittest.TestCase):
     def get_records(self):
         ''' Helper method to get all records
         '''
-        with sqlite3.connect(db.sql_db) as con:
+        with sqlite3.connect(conf.sinkhole_db) as con:
             return con.execute("SELECT * FROM {0}".format(db.db_sinkhole_table)).fetchall()
 
     def test_update_records(self):
