@@ -12,9 +12,13 @@ import unbound_sinkhole.db as db
 import tempfile
 import unbound_sinkhole.unbound as unbound
 
+#breakpoint
+#from pprint import pprint as pp; from code import interact; interact(local=dict(globals(), **locals()))
+
+
 default_sinkhole_response = "always_nxdomain"
 template = 'local-zone "{0}" ' + default_sinkhole_response
-include_statement = 'include: ' + conf.sinkhole_conf + '\n'
+include_statement = 'include: {0}\n'
 
 def records_to_file():
     """Write records to the sinkhole file.
@@ -36,8 +40,8 @@ def update_server_config(config_file, enable=True):
             this determines whether sinkholing is enabled.
     """
 
-    unbound.insert_line(config_file,
-                        include_statement,
+    return unbound.insert_line(config_file,
+                        include_statement.format(conf.sinkhole_conf),
                         present=enable)
 
 # def update_server_config(config_file, enable=True):

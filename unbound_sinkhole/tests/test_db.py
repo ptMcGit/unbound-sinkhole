@@ -6,7 +6,6 @@ import unittest
 conf.initialize_confs('unbound_sinkhole/tests/inputs/test_config')
 db.sinkhole_db = conf.sinkhole_db
 
-
 class TestDb(unittest.TestCase):
     def setUp(self):
         db.init_db()

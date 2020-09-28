@@ -1,5 +1,15 @@
 import argparse
 
+def parse_args(args=None):
+    if args is None:
+        return parser.parse_args()
+    else:
+        return parser.parse_args(args)
+
+
+
+
+
 file_arg = (['--file',
              '--f'],
             {'dest': 'file',

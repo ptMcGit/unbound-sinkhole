@@ -20,7 +20,14 @@ def initialize_confs(config_file):
     if (this.configs is None):
         cp = configparser.ConfigParser()
         cp.read(config_file)
+
+
+        #breakpoint
+#        from pprint import pprint as pp; from code import interact; interact(local=dict(globals(), **locals()))
+
         main_section = cp['main']
+
+
 
         # convert any empty strings to None
         d = {**dict(main_section),

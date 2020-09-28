@@ -103,6 +103,7 @@ def delete_records(records):
             WHERE (ip_addr = "{1}" AND url = "{2}")'''.format(db_sinkhole_table,
                                                          r[0],
                                                          r[1]))
+    return True
 
 def purge_db():
     """ Purge all the records from the db.
@@ -114,7 +115,9 @@ def purge_db():
         return
 
     with sqlite3.connect(sinkhole_db) as con:
-        con.execute("DELETE FROM {0}".format(db_sinkhole_table))
+        res = con.execute("DELETE FROM {0}".format(db_sinkhole_table))
+
+    return True
 
 def get_blacklist():
     """ Get all blacklist records.

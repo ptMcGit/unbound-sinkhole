@@ -4,6 +4,7 @@ remote-control:
   control-enable: no
 
 server:
+include: unbound_sinkhole/tests/outputs/sinkhole.conf
 # list on local interfaces
   interface: 127.0.0.1
   interface: ::1

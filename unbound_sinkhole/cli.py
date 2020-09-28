@@ -29,39 +29,34 @@ import unbound_sinkhole.argparser as argparser
 import unbound_sinkhole.db as db
 import unbound_sinkhole.parsing as parsing
 import unbound_sinkhole.unbound as unbound
+import unbound_sinkhole.writer as writer
 import unbound_sinkhole.conf as conf
 
 import os
 import sys
 
 main_config = "/usr/local/etc/unbound-sinkhole/unbound-sinkhole.conf"
-main_config = "unbound_sinkhole/data/unbound-sinkhole.conf"
-def main():
+
+def _print_stderr(msg):
+    print("{0}: {1}".format(sys.argv[0].split('/')[-1], msg),
+          file=sys.stderr)
+
+def main(cmdline_override=None):
     """Main entrypoint."""
 
     conf.initialize_confs(main_config)
 
-    #breakpoint
-    from pprint import pprint as pp; from code import interact; interact(local=dict(globals(), **locals()))
+    db.sinkhole_db = conf.sinkhole_db
 
-
-#    configs = conf.get_confs(main_config)
-
-
-    # sql_db = configs['sinkhole_db']
-    # sinkhole_file = configs['sinkhole_conf']
-    # server_conf = configs['server_conf']
-
-#    if server_conf is None:
-#        raise Exception('server config file is not set, you can set it in {0}'.format(main_config))
-
-    #breakpoint
-    from pprint import pprint as pp; from code import interact; interact(local=dict(globals(), **locals()))
-
-    args = argparser.parser.parse_args()
+    if cmdline_override is None:
+        #args = argparser.parser.parse_args()
+        args = argparser.parse_args()
+    else:
+        args = argparser.parse_args(cmdline_override)
 
     if args.sub_command == "reset":
-        db.purge_db()
+        if db.purge_db():
+            _print_stderr("DB successfully reset")
 
     if args.sub_command == "modify":
         db_arg = args.positional_arg
@@ -69,20 +64,25 @@ def main():
         if args.file:
             record_gen = process_files(db_arg)
         else:
-            record_gen = (r for r in (db_arg[0], db_arg[1]))
+            record_gen = (r for r in [(db_arg[0], db_arg[1])])
 
         if args.delete:
-            db.delete_records(record_gen)
+            if db.delete_records(record_gen):
+                _print_stderr('success')
         elif args.whitelist:
-            db.update_records(record_gen, blacklist=False)
+            if db.update_records(record_gen, blacklist=False):
+                _print_stderr('success')
         elif args.blacklist:
-            db.update_records(record_gen, blacklist=True)
+            if db.update_records(record_gen, blacklist=True):
+                _print_stderr('success')
 
     elif args.sub_command == "enable":
-        writer.update_server_config(config_file, enable=True)
+        writer.update_server_config(conf.server_conf, enable=True)
+        _print_stderr('success')
 
     elif args.sub_command == "disable":
-        writer.update_server_config(config_file, enable=False)
+        writer.update_server_config(conf.server_conf, enable=False)
+        _print_stderr('success')
 
     if args.reload:
         unbound.restart()

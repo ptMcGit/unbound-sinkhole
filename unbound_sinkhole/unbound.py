@@ -65,6 +65,7 @@ def insert_line(config_file, statement,  present=True):
             tf.write(line)
 
         tf.writelines(cf.readlines())
+        return True
 
 
     # copy tempfile contents to config file
