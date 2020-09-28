@@ -73,10 +73,12 @@ class TestMyClass(unittest.TestCase):
             while lineA == lineB and lineA != '':
                 lineA = sc.readline()
                 lineB = so.readline()
+
             # leading whitespace is determined at the time of insertion
-            if matches_original and re.match('^(\s*)' +
-                        writer.include_statement.rstrip() + '[\n]'
-                        + '$', lineA):
+            if not matches_original and re.match('^(\s*)'
+                                                 + writer.include_statement.rstrip().format(conf.sinkhole_conf)
+                                                 + '[\n]'
+                                                 + '$', lineA):
                 result = True
                 lineA = sc.readline()
             while lineA == lineB  and lineA != '':
@@ -103,16 +105,16 @@ class TestMyClass(unittest.TestCase):
 
         # enable
         writer.update_server_config(server_config, enable=True)
-        self.assertTrue(self.check_config())
+        self.assertTrue(self.check_config(matches_original=False))
         # enable twice
         writer.update_server_config(server_config, enable=True)
-        self.assertTrue(self.check_config())
+        self.assertTrue(self.check_config(matches_original=False))
         # disable
         writer.update_server_config(server_config, enable=False)
-        self.assertFalse(self.check_config(matches_original=False))
+        self.assertFalse(self.check_config(matches_original=True))
         # disable twice
         writer.update_server_config(server_config, enable=False)
-        self.assertFalse(self.check_config(matches_original=False))
+        self.assertFalse(self.check_config(matches_original=True))
 
 
 if __name__ == '__main__':

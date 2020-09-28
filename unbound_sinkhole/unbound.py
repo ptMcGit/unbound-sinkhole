@@ -65,14 +65,13 @@ def insert_line(config_file, statement,  present=True):
             tf.write(line)
 
         tf.writelines(cf.readlines())
-        return True
-
 
     # copy tempfile contents to config file
     # (avoiding copying the file, changing perms, etc.)
     with open(config_file, "w") as cf, open(temp_file, "r") as tf:
         cf.writelines(tf.readlines())
 
+    return True
 
 def test_server_config(config):
     """ Use unbound-checkconf to check config.
