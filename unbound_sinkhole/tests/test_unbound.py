@@ -1,16 +1,17 @@
+"""Test unbound module.
+"""
+
 import unittest
 
 class TestUnbound(unittest.TestCase):
-
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
+    """Test unbound moudle.
+    """
 
     def test_insert_line(self):
-        # this gets covered by test_writer.test_modify_server_config()
-        pass
+        """Test insertion into unbound config.
+        """
+        # this gets covered by test_writer.test_modify_SERVER_CONFig()
+        ...
 
 
 if __name__ == '__main__':

@@ -1,32 +1,23 @@
-"""
-Writer funcions.
+"""Module with writer funcions.
 
 These functions help write data to the DNS sinkhole file
-for consumption by unbound.
+for consumption by Unbound.
 """
 
 import unbound_sinkhole.conf as conf
-
-import sqlite3
 import unbound_sinkhole.db as db
-import tempfile
 import unbound_sinkhole.unbound as unbound
 
-#breakpoint
-#from pprint import pprint as pp; from code import interact; interact(local=dict(globals(), **locals()))
-
-
-default_sinkhole_response = "always_nxdomain"
-template = 'local-zone "{0}" ' + default_sinkhole_response
-include_statement = 'include: {0}\n'
+_DEFAULT_SINKHOLE_RESPONSE = "always_nxdomain"
+TEMPLATE = 'local-zone "{0}" ' + _DEFAULT_SINKHOLE_RESPONSE
+INCLUDE_STATEMENT = 'include: {0}\n'
 
 def records_to_file():
     """Write records to the sinkhole file.
     """
-    with open(sinkhole_file, "w") as f:
-        for r in db.get_blacklist():
-           f.write(template.format(r.url) + '\n')
-
+    with open(conf.SINKHOLE_CONF, "w") as sfh:
+        for record in db.get_blacklist():
+            sfh.write(TEMPLATE.format(record.url) + '\n')
 
 def update_server_config(config_file, enable=True):
     """Update the server config.
@@ -41,51 +32,5 @@ def update_server_config(config_file, enable=True):
     """
 
     return unbound.insert_line(config_file,
-                        include_statement.format(conf.sinkhole_conf),
+                        INCLUDE_STATEMENT.format(conf.SINKHOLE_CONF),
                         present=enable)
-
-# def update_server_config(config_file, enable=True):
-#     """Update the server configuration file.
-
-#     Update the server configuration file by adding/removing
-#     the include statement.
-
-#     args:
-#         config_file: the server config file to modify.
-#         enable: whether or not the include statement should be
-#            enabled.
-#     """
-#     # create temp file
-#     temp_file = tempfile.mkstemp()
-
-#     # create new file in temp file
-#     # adding/omitting the include statement as needed
-#     # overwrite existing file with the temp file
-#     with open(config_file, "r") as cf, open(temp_file, "w") as tf:
-
-#         server_clause =  '^\s*(server:)(\s)*(#.*)?$'
-#         generic_clause = '^\s*([a-z]{1}[a-z-]*[a-z]{1}:)(\s)*(#.*)?$'
-
-
-#         line = cf.readline()
-#         while not re.match(server_clause, line):
-#             tf.write(line)
-#             line = cf.readline()
-
-#         lines = [line]
-#         line = cf.readline()
-#         while not re.match(generic_clause, line):
-#             lines.append(line)
-#             line = cf.readline()
-#         if enable:
-#             if (include_statement not in lines):
-#                 tf.write(line)
-#         else:
-#             try:
-#                 lines.remove(include_statement)
-#             except ValueError as e:
-#                 ...
-#         for line in lines:
-#             tf.write(line)
-
-#         tf.writelines(cf.readlines())

@@ -1,10 +1,23 @@
+""" Module for parsing command line arguments.
+"""
+
 import argparse
 
 def parse_args(args=None):
+    """Wrapper function that parses cmdline args.
+
+    Wrapper function that allows default args (sys.argv)
+    to be overridden.
+
+    Args:
+        args: args to override with.
+    Returns: parsed arguments.
+    """
+
     if args is None:
         return parser.parse_args()
-    else:
-        return parser.parse_args(args)
+
+    return parser.parse_args(args)
 
 
 

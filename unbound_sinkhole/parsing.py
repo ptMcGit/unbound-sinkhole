@@ -1,8 +1,9 @@
-"""
-Module for
+""" Module for parsing and validating data.
+
+Does the following:
 
 - parsing records from files
-- validating records
+- validates records
 
 The expected format for records is
 
@@ -12,7 +13,6 @@ The expected format for records is
 import ipaddress
 from pathlib import Path
 import re
-from urllib.parse import urlparse
 
 def _check_hostname(hostname):
     """Thorough hostname validation.
@@ -31,7 +31,7 @@ def _check_hostname(hostname):
         return False
     if hostname[-1] == ".":
         hostname = hostname[:-1] # strip exactly one dot from the right, if present
-    allowed = re.compile("(?!-)[A-Z\d-]{1,63}(?<!-)$", re.IGNORECASE)
+    allowed = re.compile(r"(?!-)[A-Z\d-]{1,63}(?<!-)$", re.IGNORECASE)
     return all(allowed.match(x) for x in hostname.split("."))
 
 def _check_ip_addr(address):
@@ -47,7 +47,7 @@ def _check_ip_addr(address):
     """
     try:
         return ipaddress.ip_address(address)
-    except ValueError as e:
+    except ValueError:
         return False
 
 def record_check(record):
@@ -59,7 +59,7 @@ def record_check(record):
     Returns: The record when valid, else None.
     """
     # remove any successive whitespace, and strip sides
-    record = re.sub('^(\s*)(\S+)(\s+)(\S+)(\s*)$',
+    record = re.sub(r'^(\s*)(\S+)(\s+)(\S+)(\s*)$',
                     '\\2 \\4',
                     record).split(' ')
 
@@ -82,8 +82,8 @@ def _gen_records(filelist):
     """
     # if no errors
     for item in filelist:
-        with open(item, 'r') as f:
-            for line in f:
+        with open(item, 'r') as fileh:
+            for line in fileh:
                 yield tuple(record_check(line))
 
 
@@ -106,16 +106,14 @@ def process_files(filelist):
     """
     # evaluate each file and each record first
     for item in filelist:
-        print(item)
         if not Path(item).exists():
             raise Exception("path does not exist")
-        with open(item, 'r') as f:
-            c = 1
-            for line in f:
+        with open(item, 'r') as fileh:
+            count = 1
+            for line in fileh:
                 record_status = record_check(line)
                 if not record_status:
-                    # TODO where is the bad record
-                    raise Exception('bad record found at line {0} in file {1}'.format(c, item))
-                c += 1
+                    raise Exception('bad record found at line {0} in file {1}'.format(count, item))
+                count += 1
 
     return _gen_records(filelist)

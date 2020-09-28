@@ -1,14 +1,18 @@
+"""Module that reads and stores configuration.
+
+Configuration is read from a configuration file; then
+the key value pairs are attached to the module so
+that they function as module-level variables.
+"""
+
 from collections import defaultdict
 import configparser
-# db.py
 import sys
 
-
-sql_db = None
-#sinkhole_db = None
-sinkhole_file = None
-#sinkhole_conf = None
-unbound_conf = None
+SINKHOLE_DB = None
+SINKHOLE_CONF = None
+UNBOUND_CONF = None
+SERVER_CONF = None
 
 # this is a pointer to the module object instance itself.
 this = sys.modules[__name__]
@@ -17,49 +21,31 @@ this = sys.modules[__name__]
 this.configs = None
 
 def initialize_confs(config_file):
-    if (this.configs is None):
-        cp = configparser.ConfigParser()
-        cp.read(config_file)
+    """Read configs from config file.
 
+    Read the key-value pairs from the config file
+    provided, and attach them to the module.
 
-        #breakpoint
-#        from pprint import pprint as pp; from code import interact; interact(local=dict(globals(), **locals()))
+    Args:
+        config_file: the configuration file to read from.
+    """
 
-        main_section = cp['main']
+    if this.configs is None:
+        parser = configparser.ConfigParser()
 
+        parser.read(config_file)
 
+        main_section = parser['main']
 
         # convert any empty strings to None
-        d = {**dict(main_section),
+        data = {**dict(main_section),
              **dict( (key, None) for (key, val) in main_section.items() if val == '')}
 
-        d = defaultdict(lambda : None, d)
+        data = defaultdict(lambda : None, data)
 
-        for k, v in d.items():
-            setattr(this, k, v)
+        for key, val in data.items():
+            setattr(this, key.upper(), val)
 
-    else:
-        msg = "Config file has already been imported."
-        raise RuntimeError(msg)
+        return
 
-
-# def get_confs(config_file):
-#     """Get configuration values from the configuration file.
-
-#     Read the configuration file and return the key-values such
-#     unassigned keys' values are None.
-
-#     Args:
-#         config_file: the configuration file to read
-
-#     Returns: a dict containing the configuration values.
-#     """
-#     cp = configparser.ConfigParser()
-#     cp.read(config_file)
-#     main_section = cp['main']
-
-#     # convert any empty strings to None
-#     d = {**dict(main_section),
-#          **dict( (key, None) for (key, val) in main_section.items() if val == '')}
-
-#     return defaultdict(lambda : None, d)
+    raise RuntimeError("Config file has already been imported.")

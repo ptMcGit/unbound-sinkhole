@@ -1,24 +1,19 @@
+"""Module with Unbound related functions.
 """
-Unbound related functions.
-"""
-
 
 import os
 import re
-import shutil
 import subprocess
 import tempfile
 
-_unbound_checkconf = '/usr/sbin/unbound-checkconf'
-_unbound_service = 'unbound.service'
+_UNBOUND_CHECKCONF = '/usr/sbin/unbound-checkconf'
+_UNBOUND_SERVICE = 'unbound.service'
 
-server_clause_re =  '^\s*(server:)(\s)*(#.*)?$'
-generic_clause_re = '^\s*([a-z]{1}[a-z-]*[a-z]{1}:)(\s)*(#.*)?$'
-
-
+_SERVER_CLAUSE_RE =  r'^\s*(server:)(\s)*(#.*)?$'
+_GENERIC_CLAUSE_RE = r'^\s*([a-z]{1}[a-z-]*[a-z]{1}:)(\s)*(#.*)?$'
 
 def insert_line(config_file, statement,  present=True):
-    """Idempotently insert/remove line from file.
+    """Idempotently nsert/remove line from file.
 
     Update the server configuration file by adding/removing
     the include statement.
@@ -34,60 +29,62 @@ def insert_line(config_file, statement,  present=True):
     # create new file in temp file
     # adding/omitting the include statement as needed
     # overwrite existing file with the temp file
-    with open(config_file, "r") as cf, open(temp_file, "w") as tf:
+    with open(config_file, "r") as cfh, open(temp_file, "w") as tfh:
 
-        line = cf.readline()
-        while not re.match(server_clause_re, line):
-            tf.write(line)
-            line = cf.readline()
+        line = cfh.readline()
+        while not re.match(_SERVER_CLAUSE_RE, line):
+            tfh.write(line)
+            line = cfh.readline()
 
         server_clause = line
         lines = []
-        line = cf.readline()
-        while not re.match(generic_clause_re, line):
+        line = cfh.readline()
+        while not re.match(_GENERIC_CLAUSE_RE, line):
             lines.append(line)
-            line = cf.readline()
+            line = cfh.readline()
         lines.append(line)
 
-        tf.write(server_clause)
+        tfh.write(server_clause)
         if present:
-            if (statement not in lines):
+            if statement not in lines:
                 # insert the statement with leading whitespace that should be present
 
-                tf.write(re.match('^(\s*)(.*)$', lines[0]).groups()[0] +
+                tfh.write(re.match(r'^(\s*)(.*)$', lines[0]).groups()[0] +
                          statement)
         else:
             try:
                 lines.remove(statement)
-            except ValueError as e:
+            except ValueError:
                 pass
         for line in lines:
-            tf.write(line)
+            tfh.write(line)
 
-        tf.writelines(cf.readlines())
+        tfh.writelines(cfh.readlines())
 
     # copy tempfile contents to config file
     # (avoiding copying the file, changing perms, etc.)
-    with open(config_file, "w") as cf, open(temp_file, "r") as tf:
-        cf.writelines(tf.readlines())
+    with open(config_file, "w") as cfh, open(temp_file, "r") as tfh:
+        cfh.writelines(tfh.readlines())
 
     return True
 
 def test_server_config(config):
-    """ Use unbound-checkconf to check config.
+    """Use unbound-checkconf to check config.
 
     args:
         config: file to check
     raises:
         CalledProcessError when exit status not 0.
     """
-    subprocess.check_call([_unbound_checkconf, config])
+    subprocess.check_call([_UNBOUND_CHECKCONF, config])
 
 def get_substate():
-    return subprocess.call('systemctl show --property="SubState" ' + unbound_service)
+    """Get the systemd substate of the Unbound service.
+    """
+    return subprocess.call('systemctl show --property="SubState" ' + _UNBOUND_SERVICE)
 
 def restart():
-    """ Restart unbound using systemd.
+    """Restart unbound using systemd.
     """
     if os.geteuid() != 0:
         raise Exception('must be root')
@@ -95,4 +92,4 @@ def restart():
     substate = get_substate()
     if substate != 'SubState=running':
         raise Exception('unbound is not running')
-    subprocess.call('systemctl restart ' + unbound_service)
+    subprocess.call('systemctl restart ' + _UNBOUND_SERVICE)
