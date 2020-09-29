@@ -1,7 +1,15 @@
 """ Setup file.
 """
+import setuptools
 
-# import setuptools
+if __name__ == '__main__':
+    setuptools.setup(
+        entry_points={
+            'console_scripts': [
+                'unbound_sinkhole = unbound_sinkhole.cli:main',
+            ]
+        }
+    )
 
 # if __name__ == '__main__':
 #     setuptools.setup(
